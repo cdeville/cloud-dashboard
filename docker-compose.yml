@@ -1,0 +1,23 @@
+services:
+  streamlit:
+    build:
+      context: .
+      target: dev
+      args:
+        USER_UID: ${USER_UID:-1000}
+        USER_GID: ${USER_GID:-1000}
+    container_name: cloud_dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      - AWS_CONFIG_FILE=/home/appuser/.aws/config
+      - AWS_SHARED_CREDENTIALS_FILE=/home/appuser/.aws/credentials
+      - AWS_PROFILE=${AWS_PROFILE:-default}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+    volumes:
+      # Mount AWS credentials directory (writable for SSO cache)
+      - ~/.aws:/home/appuser/.aws
+      # Mount code for hot-reloading during development
+      - ./Dashboard.py:/app/Dashboard.py
+      - ./pages:/app/pages
+    restart: unless-stopped
