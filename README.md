@@ -2,6 +2,8 @@
 
 A Streamlit-based web application for monitoring AWS resources.
 
+![Cloud Dashboard Lambda Functions](./Cloud-Dashboard-Lambda-Functions.png)  
+
 ## Quick Start
 
 ### Prerequisites
