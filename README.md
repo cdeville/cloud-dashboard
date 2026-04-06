@@ -1,6 +1,6 @@
 # Cloud Health Dashboard
 
-A Streamlit-based web application for monitoring AWS resources, starting with Lambda functions.
+A Streamlit-based web application for monitoring AWS resources.
 
 ## Quick Start
 
@@ -52,7 +52,7 @@ docker run -p 8501:8501 \
   cloud-dashboard:dev
 ```
 
-### Option 3: Build for AWS Deployment
+### Option 3: Build for AWS Deployment - in development
 
 ```bash
 # Build the AWS/production image (uses UID/GID 1000)
@@ -168,8 +168,8 @@ docker compose up
 To add a new dashboard page:
 
 1. Create a new Python file in the `pages/` directory
-2. Use numbered prefixes to control order (e.g., `3_S3_Dashboard.py`)
-3. The text after the number and underscore becomes the sidebar label (e.g., `3_S3_Dashboard.py` → "S3 Dashboard")
+2. Pages will be listed in alpha-numerical order (e.g., `ECS_Dashboard.py before S3_Dashboard.py`)
+3. The text before the .suffix (.py) becomes the sidebar label (e.g., `S3_Dashboard.py` → "S3 Dashboard")
 4. Structure your page like the existing examples:
 
 ```python
