@@ -47,6 +47,38 @@ def get_rds_databases(region='us-east-2', profile=None):
             # Get Multi-AZ status
             multi_az = 'Yes' if cluster.get('MultiAZ', False) else 'No'
             
+            # Get capacity/instance information
+            instance_info = 'N/A'
+            # Check for Serverless v2 scaling configuration
+            if 'ServerlessV2ScalingConfiguration' in cluster:
+                scaling = cluster['ServerlessV2ScalingConfiguration']
+                min_capacity = scaling.get('MinCapacity', 'N/A')
+                max_capacity = scaling.get('MaxCapacity', 'N/A')
+                instance_info = f"Serverless v2 ({min_capacity}-{max_capacity} ACU)"
+            # Check for Serverless v1 capacity
+            elif 'Capacity' in cluster:
+                capacity = cluster.get('Capacity')
+                instance_info = f"Serverless v1 ({capacity} ACU)"
+            # Get cluster members' instance classes
+            elif 'DBClusterMembers' in cluster and cluster['DBClusterMembers']:
+                member_classes = set()
+                for member in cluster['DBClusterMembers']:
+                    # Get member instance details
+                    member_id = member.get('DBInstanceIdentifier')
+                    if member_id:
+                        try:
+                            member_details = rds_client.describe_db_instances(
+                                DBInstanceIdentifier=member_id
+                            )
+                            if member_details['DBInstances']:
+                                member_class = member_details['DBInstances'][0].get('DBInstanceClass', '')
+                                if member_class:
+                                    member_classes.add(member_class)
+                        except Exception:
+                            pass
+                if member_classes:
+                    instance_info = ', '.join(sorted(member_classes))
+            
             databases_data.append({
                 'Name': cluster_id,
                 'Type': 'Aurora Cluster',
@@ -63,7 +95,7 @@ def get_rds_databases(region='us-east-2', profile=None):
                 'Parameter Group': cluster.get('DBClusterParameterGroup', 'N/A'),
                 'Storage Type': 'Aurora',
                 'Allocated Storage (GB)': 'Auto-scaled',
-                'Instance Class': 'N/A',
+                'Instance Class': instance_info,
                 'Created': str(cluster.get('ClusterCreateTime', 'N/A'))
             })
         

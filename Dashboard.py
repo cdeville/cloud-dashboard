@@ -16,6 +16,21 @@ Welcome to the AWS Cloud Health Dashboard - a comprehensive monitoring tool for 
 
 Use the navigation on the left to access different dashboards:
 
+### CloudWatch Metrics
+Monitor and manage your CloudWatch alarms:
+- View all CloudWatch metric alarms and composite alarms
+- Summary metrics (total alarms, ALARM state, OK state, insufficient data)
+- Alarm details (state, conditions, thresholds, actions)
+- Last state update timestamps in local time
+- Interactive visualizations:
+  - Alarm state distribution pie chart
+  - Top namespaces by alarm count
+  - Actions enabled status
+- Alert summary highlighting alarms in ALARM state or with issues
+- Filter by state, namespace, and actions enabled status
+- CSV export functionality
+- **AWS profile selector** - Switch between different AWS accounts
+
 ### ECS Dashboard
 Monitor your Amazon ECS clusters, services, and tasks:
 - Cluster overview with status and capacity metrics

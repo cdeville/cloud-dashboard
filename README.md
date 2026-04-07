@@ -2,7 +2,7 @@
 
 A Streamlit-based web application for monitoring AWS resources.  The biggest benefit of this tool is that by logging in with "aws sso login" you can connect to any of your AWS accounts in an organization in real-time to check status, configuration, etc.
 
-![Cloud Dashboard Lambda Functions](./Cloud-Dashboard-Lambda-Functions.png)  
+![Cloud Dashboard Lambda Functions](./images/Cloud-Dashboard-Lambda-Functions.png)  
 
 ## Quick Start
 
@@ -66,6 +66,21 @@ docker run -p 8501:8501 cloud-dashboard:aws
 
 ## Features
 
+### CloudWatch Metrics Dashboard
+- View all CloudWatch metric alarms and composite alarms
+- Summary metrics (total alarms, ALARM state, OK state, insufficient data)
+- Alarm details including state, conditions, thresholds, and actions
+- Last state update timestamps displayed in local time
+- Interactive visualizations:
+  - Alarm state distribution pie chart
+  - Top 10 namespaces by alarm count
+  - Actions enabled status distribution
+- Alert summary with warnings for alarms in ALARM state or with insufficient data
+- Filter by state, namespace, and actions enabled status
+- Sort alarms by state priority (ALARM first)
+- CSV export functionality
+- **AWS profile selector** - Switch between different AWS accounts
+
 ### Lambda Functions Dashboard
 - View all Lambda functions in selected region
 - Summary metrics (total functions, memory, timeouts)
@@ -94,6 +109,66 @@ docker run -p 8501:8501 cloud-dashboard:aws
 - Container image tracking from task definitions
 - Task definition details with CPU/memory allocation
 - CSV export for all data tables
+- **AWS profile selector** - Switch between different AWS accounts
+
+### EC2 Dashboard
+- View all EC2 instances with comprehensive details
+- Summary metrics (total instances, running, stopped, instance types)
+- Instance information (Name, ID, State, Type, IPs, IAM roles)
+- Interactive visualizations:
+  - Instance state distribution pie chart
+  - Instance type distribution bar chart
+  - Availability zone distribution
+  - Platform distribution (Linux/Unix vs Windows)
+- Filter by state, instance type
+- CSV export functionality
+- **AWS profile selector** - Switch between different AWS accounts
+
+### S3 Dashboard
+- Monitor all S3 buckets with security configuration
+- Summary metrics (total buckets, encryption %, versioning, public access blocked)
+- Bucket details (encryption, versioning, logging, public access settings)
+- Interactive visualizations:
+  - Encryption status pie chart
+  - Versioning status distribution
+  - Public access block configuration
+  - Logging status
+  - Regional distribution of buckets
+  - Encryption type breakdown
+- Security summary with warnings for unencrypted buckets and public access issues
+- Filter by encryption, versioning, and region
+- CSV export for compliance audits
+- **AWS profile selector** - Switch between different AWS accounts
+
+### EFS Dashboard
+- Monitor all EFS file systems with configuration details
+- Summary metrics (total file systems, encrypted count, available, total size)
+- File system information (state, encryption, size, mount targets, availability zones)
+- Replication configuration and overwrite protection status
+- Interactive visualizations:
+  - File system state distribution
+  - Encryption status
+  - Replication status
+- Security summary highlighting unencrypted file systems and missing replication
+- Filter by state, encryption, and replication status
+- CSV export functionality
+- **AWS profile selector** - Switch between different AWS accounts
+
+### RDS Dashboard
+- Monitor RDS databases and Aurora clusters
+- Summary metrics (total databases, encrypted, Multi-AZ, backups enabled)
+- Database details (engine, version, endpoint, port, encryption, backups)
+- Support for both Aurora clusters and standard RDS instances
+- Interactive visualizations:
+  - Database status distribution
+  - Encryption status
+  - Backup status
+  - Engine distribution
+  - Multi-AZ deployment status
+- Security & reliability summary with warnings for unencrypted databases, disabled backups, no Multi-AZ
+- Parameter group and option group tracking
+- Filter by type (Aurora/RDS), engine, and status
+- CSV export functionality
 - **AWS profile selector** - Switch between different AWS accounts
 
 ### Multi-Page Navigation
@@ -220,18 +295,31 @@ Your AWS user/role needs these permissions:
     {
       "Effect": "Allow",
       "Action": [
-        "lambda:ListFunctions",
+        "cloudwatch:DescribeAlarms",
         "cloudwatch:GetMetricStatistics",
+        "ec2:DescribeInstances",
+        "ecr:DescribeImages",
+        "ecs:DescribeClusters",
+        "ecs:DescribeServices",
+        "ecs:DescribeTaskDefinition",
+        "ecs:DescribeTasks",
+        "ecs:ListClusters",
+        "ecs:ListServices",
+        "ecs:ListTasks",
+        "elasticfilesystem:DescribeFileSystems",
+        "elasticfilesystem:DescribeMountTargets",
+        "elasticfilesystem:DescribeReplicationConfigurations",
+        "lambda:ListFunctions",
         "logs:DescribeLogGroups",
         "logs:FilterLogEvents",
-        "ecs:ListClusters",
-        "ecs:DescribeClusters",
-        "ecs:ListServices",
-        "ecs:DescribeServices",
-        "ecs:ListTasks",
-        "ecs:DescribeTasks",
-        "ecs:DescribeTaskDefinition",
-        "ecr:DescribeImages"
+        "rds:DescribeDBClusters",
+        "rds:DescribeDBInstances",
+        "s3:GetBucketLogging",
+        "s3:GetBucketLocation",
+        "s3:GetBucketPublicAccessBlock",
+        "s3:GetBucketVersioning",
+        "s3:GetEncryptionConfiguration",
+        "s3:ListAllMyBuckets"
       ],
       "Resource": "*"
     }
@@ -259,9 +347,14 @@ cloud_dashboard/
 ├── Dashboard.py           # Main landing page
 ├── shared_libs.py         # Shared library functions
 ├── pages/                 # Multi-page app structure (alphabetically ordered)
+│   ├── CloudWatch_Metrics.py  # CloudWatch alarms monitoring
+│   ├── EC2_Dashboard.py       # EC2 instance monitoring
 │   ├── ECS_Dashboard.py       # ECS clusters, services, tasks monitoring
+│   ├── EFS_Dashboard.py       # EFS file system monitoring
 │   ├── Lambda_Failures.py     # Lambda failure analysis and error logs
-│   └── Lambda_Functions.py    # Lambda functions overview and metrics
+│   ├── Lambda_Functions.py    # Lambda functions overview and metrics
+│   ├── RDS_Dashboard.py       # RDS and Aurora database monitoring
+│   └── S3_Dashboard.py        # S3 bucket security and configuration
 └── README.md             # This file
 ```
 
@@ -285,7 +378,4 @@ cloud_dashboard/
 - [x] S3 bucket analysis
 - [x] EFS monitoring
 - [x] RDS database status
-- [ ] Additional CloudWatch metrics and graphs
-- [ ] Cost tracking and alerts
-- [ ] Custom dashboard layouts
-
+- [x] CloudWatch alarms monitoring
