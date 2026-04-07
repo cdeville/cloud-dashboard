@@ -24,6 +24,14 @@ Monitor your Amazon ECS clusters, services, and tasks:
 - Container image tracking from task definitions
 - Export data for offline analysis
 
+### EC2 Dashboard
+Monitor and analyze your Amazon EC2 instances:
+- View all instances with key information (Name, ID, State, Type, IPs)
+- Track IAM roles and security configurations
+- Visualize distribution by state, type, and availability zone
+- Filter and export instance data for analysis
+- Monitor resource allocation across your infrastructure
+
 ### Lambda Failures
 Track and troubleshoot Lambda function failures:
 - Identify functions with errors over customizable time periods
