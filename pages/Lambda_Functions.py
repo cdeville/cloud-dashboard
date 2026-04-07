@@ -1,5 +1,4 @@
 import streamlit as st
-import boto3
 import pandas as pd
 from datetime import datetime, timedelta, timezone
 import plotly.express as px
@@ -9,7 +8,7 @@ from pathlib import Path
 
 # Add parent directory to path for shared_libs import
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from shared_libs import get_aws_profiles
+from shared_libs import get_aws_profiles, get_aws_client
 
 # Page config
 st.set_page_config(
@@ -19,28 +18,11 @@ st.set_page_config(
 
 st.title("Lambda Functions")
 
-# Initialize AWS clients
-@st.cache_resource
-def get_lambda_client(region='us-east-2', profile=None):
-    """Initialize AWS Lambda client (uses AWS_PROFILE from environment)"""
-    if profile:
-        session = boto3.Session(profile_name=profile)
-        return session.client('lambda', region_name=region)
-    return boto3.client('lambda', region_name=region)
-
-@st.cache_resource
-def get_cloudwatch_client(region='us-east-2', profile=None):
-    """Initialize CloudWatch client"""
-    if profile:
-        session = boto3.Session(profile_name=profile)
-        return session.client('cloudwatch', region_name=region)
-    return boto3.client('cloudwatch', region_name=region)
-
 # Fetch Lambda invocation metrics
 @st.cache_data(ttl=300)
 def get_function_metrics(function_name, region='us-east-2', profile=None):
     """Get last invocation metrics for a Lambda function"""
-    cloudwatch = get_cloudwatch_client(region, profile)
+    cloudwatch = get_aws_client('cloudwatch', region, profile)
     end_time = datetime.now(timezone.utc)
     start_time = end_time - timedelta(days=7)  # Look back 7 days
     
@@ -98,7 +80,7 @@ def get_function_metrics(function_name, region='us-east-2', profile=None):
 @st.cache_data(ttl=300)  # Cache for 5 minutes
 def get_lambda_functions(region='us-east-2', profile=None):
     """Fetch all Lambda functions with invocation metrics"""
-    client = get_lambda_client(region, profile)
+    client = get_aws_client('lambda', region, profile)
     functions = []
     
     try:

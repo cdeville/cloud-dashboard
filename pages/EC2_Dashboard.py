@@ -1,5 +1,4 @@
 import streamlit as st
-import boto3
 import pandas as pd
 from datetime import datetime
 import plotly.express as px
@@ -10,7 +9,7 @@ from pathlib import Path
 
 # Add parent directory to path for shared_libs import
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from shared_libs import get_aws_profiles
+from shared_libs import get_aws_profiles, get_aws_client
 
 # Page config
 st.set_page_config(
@@ -20,20 +19,11 @@ st.set_page_config(
 
 st.title("EC2 Dashboard")
 
-# Initialize AWS client
-@st.cache_resource
-def get_ec2_client(region='us-east-2', profile=None):
-    """Initialize AWS EC2 client"""
-    if profile:
-        session = boto3.Session(profile_name=profile)
-        return session.client('ec2', region_name=region)
-    return boto3.client('ec2', region_name=region)
-
 # Fetch EC2 instances
 @st.cache_data(ttl=300)
 def get_ec2_instances(region='us-east-2', profile=None):
     """Fetch all EC2 instances with details"""
-    client = get_ec2_client(region, profile)
+    client = get_aws_client('ec2', region, profile)
     instances_data = []
     
     try:
@@ -163,7 +153,7 @@ if not df.empty:
             color_discrete_sequence=colors
         )
         fig.update_layout(showlegend=True)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     
     with col2:
         st.markdown("#### Instances by Type")
@@ -174,7 +164,7 @@ if not df.empty:
             labels={'x': 'Instance Type', 'y': 'Count'}
         )
         fig.update_layout(showlegend=False, xaxis_tickangle=-45)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     
     # Row 2 - AZ distribution and State Timeline
     col1, col2 = st.columns(2)
@@ -190,7 +180,7 @@ if not df.empty:
             color_continuous_scale='viridis'
         )
         fig.update_layout(showlegend=False, xaxis_tickangle=-45)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     
     with col2:
         st.markdown("#### Instances by Platform")
@@ -199,7 +189,7 @@ if not df.empty:
             values=platform_counts.values,
             names=platform_counts.index
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     
     # Data table
     st.subheader("Instance Details")
@@ -234,7 +224,7 @@ if not df.empty:
     
     st.dataframe(
         filtered_df,
-        use_container_width=True,
+        width='stretch',
         height=500
     )
     

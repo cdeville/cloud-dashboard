@@ -1,6 +1,6 @@
 # Cloud Health Dashboard
 
-A Streamlit-based web application for monitoring AWS resources.
+A Streamlit-based web application for monitoring AWS resources.  The biggest benefit of this tool is that by logging in with "aws sso login" you can connect to any of your AWS accounts in an organization in real-time to check status, configuration, etc.
 
 ![Cloud Dashboard Lambda Functions](./Cloud-Dashboard-Lambda-Functions.png)  
 

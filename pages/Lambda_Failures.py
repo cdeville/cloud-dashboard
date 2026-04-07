@@ -1,5 +1,4 @@
 import streamlit as st
-import boto3
 import pandas as pd
 from datetime import datetime, timedelta, timezone
 import plotly.express as px
@@ -10,7 +9,7 @@ from pathlib import Path
 
 # Add parent directory to path for shared_libs import
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from shared_libs import get_aws_profiles
+from shared_libs import get_aws_profiles, get_aws_client
 
 # Page config
 st.set_page_config(
@@ -20,37 +19,12 @@ st.set_page_config(
 
 st.title("Lambda Failures Dashboard")
 
-# Initialize AWS clients
-@st.cache_resource
-def get_lambda_client(region='us-east-2', profile=None):
-    """Initialize AWS Lambda client"""
-    if profile:
-        session = boto3.Session(profile_name=profile)
-        return session.client('lambda', region_name=region)
-    return boto3.client('lambda', region_name=region)
-
-@st.cache_resource
-def get_cloudwatch_client(region='us-east-2', profile=None):
-    """Initialize CloudWatch client"""
-    if profile:
-        session = boto3.Session(profile_name=profile)
-        return session.client('cloudwatch', region_name=region)
-    return boto3.client('cloudwatch', region_name=region)
-
-@st.cache_resource
-def get_logs_client(region='us-east-2', profile=None):
-    """Initialize CloudWatch Logs client"""
-    if profile:
-        session = boto3.Session(profile_name=profile)
-        return session.client('logs', region_name=region)
-    return boto3.client('logs', region_name=region)
-
 # Fetch Lambda functions with failure metrics
 @st.cache_data(ttl=300)
 def get_failed_functions(region='us-east-2', profile=None, days=7):
     """Fetch Lambda functions that have failures in the specified time period"""
-    lambda_client = get_lambda_client(region, profile)
-    cloudwatch = get_cloudwatch_client(region, profile)
+    lambda_client = get_aws_client('lambda', region, profile)
+    cloudwatch = get_aws_client('cloudwatch', region, profile)
     
     end_time = datetime.now(timezone.utc)
     start_time = end_time - timedelta(days=days)
@@ -138,7 +112,7 @@ def get_failed_functions(region='us-east-2', profile=None, days=7):
 @st.cache_data(ttl=300)
 def get_error_timeline(function_name, region='us-east-2', profile=None, days=7):
     """Get error timeline for visualization"""
-    cloudwatch = get_cloudwatch_client(region, profile)
+    cloudwatch = get_aws_client('cloudwatch', region, profile)
     
     end_time = datetime.now(timezone.utc)
     start_time = end_time - timedelta(days=days)
@@ -170,7 +144,7 @@ def get_error_timeline(function_name, region='us-east-2', profile=None, days=7):
 @st.cache_data(ttl=300)
 def search_error_logs(function_name, region='us-east-2', profile=None, days=7, max_results=50):
     """Search CloudWatch Logs for ERROR messages"""
-    logs_client = get_logs_client(region, profile)
+    logs_client = get_aws_client('logs', region, profile)
     
     log_group_name = f"/aws/lambda/{function_name}"
     end_time = datetime.now(timezone.utc)
@@ -293,13 +267,13 @@ if not df.empty:
         color_continuous_scale='Reds'
     )
     fig.update_layout(xaxis_tickangle=-45)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
     
     # Failed functions table
     st.subheader("Functions with Failures")
     st.dataframe(
         df,
-        use_container_width=True,
+        width='stretch',
         height=300
     )
     
@@ -342,7 +316,7 @@ if not df.empty:
                 yaxis_title='Error Count',
                 hovermode='x unified'
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
         else:
             st.info("No timeline data available")
         

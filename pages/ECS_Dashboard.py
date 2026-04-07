@@ -1,5 +1,4 @@
 import streamlit as st
-import boto3
 import pandas as pd
 from datetime import datetime
 import os
@@ -8,7 +7,7 @@ from pathlib import Path
 
 # Add parent directory to path for shared_libs import
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from shared_libs import get_aws_profiles
+from shared_libs import get_aws_profiles, get_aws_client
 
 # Page config
 st.set_page_config(
@@ -18,28 +17,11 @@ st.set_page_config(
 
 st.title("ECS Dashboard")
 
-# Initialize AWS clients
-@st.cache_resource
-def get_ecs_client(region='us-east-2', profile=None):
-    """Initialize AWS ECS client (uses AWS_PROFILE from environment)"""
-    if profile:
-        session = boto3.Session(profile_name=profile)
-        return session.client('ecs', region_name=region)
-    return boto3.client('ecs', region_name=region)
-
-@st.cache_resource
-def get_ecr_client(region='us-east-2', profile=None):
-    """Initialize AWS ECR client"""
-    if profile:
-        session = boto3.Session(profile_name=profile)
-        return session.client('ecr', region_name=region)
-    return boto3.client('ecr', region_name=region)
-
 # Fetch ECS clusters
 @st.cache_data(ttl=300)
 def get_clusters(region='us-east-2', profile=None):
     """Fetch all ECS clusters"""
-    client = get_ecs_client(region, profile)
+    client = get_aws_client('ecs', region, profile)
     clusters_data = []
     
     try:
@@ -70,7 +52,7 @@ def get_clusters(region='us-east-2', profile=None):
 @st.cache_data(ttl=300)
 def get_services(cluster_name, region='us-east-2', profile=None):
     """Fetch all services in a cluster"""
-    client = get_ecs_client(region, profile)
+    client = get_aws_client('ecs', region, profile)
     services_data = []
     
     try:
@@ -107,7 +89,7 @@ def get_services(cluster_name, region='us-east-2', profile=None):
 @st.cache_data(ttl=300)
 def get_tasks(cluster_name, region='us-east-2', profile=None):
     """Fetch all running tasks in a cluster"""
-    client = get_ecs_client(region, profile)
+    client = get_aws_client('ecs', region, profile)
     tasks_data = []
     
     try:
@@ -144,8 +126,8 @@ def get_tasks(cluster_name, region='us-east-2', profile=None):
 @st.cache_data(ttl=300)
 def get_task_definition_images(cluster_name, region='us-east-2', profile=None):
     """Fetch container images from task definitions with ECR metadata"""
-    ecs_client = get_ecs_client(region, profile)
-    ecr_client = get_ecr_client(region, profile)
+    ecs_client = get_aws_client('ecs', region, profile)
+    ecr_client = get_aws_client('ecr', region, profile)
     images_data = []
     
     def get_ecr_image_details(image_uri):
