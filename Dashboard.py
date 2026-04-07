@@ -32,6 +32,38 @@ Monitor and analyze your Amazon EC2 instances:
 - Filter and export instance data for analysis
 - Monitor resource allocation across your infrastructure
 
+### EFS Dashboard
+Monitor and manage your Amazon EFS file systems:
+- View all EFS file systems with configuration details
+- Track encryption status and file system state
+- Monitor total storage size and mount targets
+- Analyze performance and throughput modes
+- View replication configurations and overwrite protection
+- Visualize distribution by state and performance characteristics
+- Security summary for encryption and replication
+- Filter and export file system data
+
+### RDS Dashboard
+Monitor and manage your Amazon RDS databases and Aurora clusters:
+- View all RDS instances and Aurora clusters with configuration details
+- Track encryption status and backup configurations
+- Monitor Multi-AZ deployments for high availability
+- Analyze database engines and versions
+- View endpoints, ports, and connection details
+- Track parameter groups and option groups
+- Security summary for encryption, backups, and Multi-AZ
+- Filter and export database data for compliance and analysis
+
+### S3 Dashboard
+Monitor and secure your Amazon S3 buckets:
+- View all S3 buckets with security and configuration details
+- Track encryption status and encryption types
+- Monitor versioning and logging configurations
+- Analyze public access block settings
+- Visualize bucket distribution by region
+- Security summary highlighting potential issues
+- Filter and export bucket data for compliance audits
+
 ### Lambda Failures
 Track and troubleshoot Lambda function failures:
 - Identify functions with errors over customizable time periods

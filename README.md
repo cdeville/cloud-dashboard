@@ -108,7 +108,7 @@ docker run -p 8501:8501 cloud-dashboard:aws
 
 The Dockerfile uses a multi-stage build with two targets:
 
-- **`dev`** - Development stage that matches your host UID/GID (default for docker-compose). Includes AWS CLI v2 for testing and debugging.
+- **`dev`** - Development stage that matches your host UID/GID (default for docker-compose). Uncomment AWS CLI v2 in the Dockerfile for testing and debugging.
 - **`aws`** - Production stage with fixed UID/GID 1000 for AWS deployment (ECS/EKS/Fargate). Minimal image without AWS CLI.
 
 ### User ID/Group ID Mapping
@@ -281,9 +281,10 @@ cloud_dashboard/
   - [x] Service monitoring
   - [x] Task monitoring with runtime info
   - [x] Container image tracking
-- [ ] EC2 instance monitoring
-- [ ] S3 bucket analysis
-- [ ] RDS database status
+- [x] EC2 instance monitoring
+- [x] S3 bucket analysis
+- [x] EFS monitoring
+- [x] RDS database status
 - [ ] Additional CloudWatch metrics and graphs
 - [ ] Cost tracking and alerts
 - [ ] Custom dashboard layouts
